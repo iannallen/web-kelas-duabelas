@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XI RPL 2 - Kelas dan Jurusan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+            color: #e5e5e5;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sticky Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .header.scrolled {
+            background: rgba(10, 10, 10, 0.98);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Full-screen sections */
+        section {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 80px 2rem 2rem;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #ffffff 0%, #cccccc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .animate-slide-fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .animate-slide-fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .floating-card {
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .floating-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-fade::before,
+        .section-fade::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 100px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .section-fade::before {
+            top: 0;
+            background: linear-gradient(to bottom, rgba(10, 10, 10, 1), rgba(10, 10, 10, 0));
+        }
+
+        .section-fade::after {
+            bottom: 0;
+            background: linear-gradient(to top, rgba(10, 10, 10, 1), rgba(10, 10, 10, 0));
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            position: relative;
+            width: 50%;
+            padding: 30px 40px;
+            box-sizing: border-box;
+        }
+
+        .timeline-item:nth-child(odd) {
+            left: 0;
+            text-align: right;
+        }
+
+        .timeline-item:nth-child(even) {
+            left: 50%;
+            text-align: left;
+        }
+
+        .timeline-content {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 25px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .gallery-container {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 20px;
+            width: 100%;
+        }
+
+        .gallery-images {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-images img {
+            min-width: 100%;
+            border-radius: 20px;
+            object-fit: cover;
+            height: 500px;
+        }
+
+        .gallery-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            color: white;
+            font-size: 24px;
+            padding: 15px;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+
+        .gallery-container:hover .gallery-btn {
+            opacity: 1;
+        }
+
+        .gallery-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .gallery-btn.prev {
+            left: 20px;
+        }
+
+        .gallery-btn.next {
+            right: 20px;
+        }
+
+        .student-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .social-icon {
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .navigation-dots {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .dot.active {
+            background: #ffffff;
+            transform: scale(1.3);
+        }
+
+        .dot::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .dot:hover::after {
+            width: 20px;
+            height: 20px;
+        }
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+                opacity: 0.3;
+            }
+        }
+
+        .typewriter {
+            overflow: hidden;
+            border-right: 3px solid #ffffff;
+            white-space: nowrap;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #ffffff }
+        }
+
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, #00ff88, #00aaff);
+            z-index: 1001;
+            transition: width 0.3s ease;
+        }
+
+        .hover-lift {
+            transition: transform 0.3s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-5px);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="relative">
+
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" id="scroll-progress"></div>
+
+    <!-- Dynamic Header -->
+    <header class="header" id="main-header">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-code text-white"></i>
+                    </div>
+                    <h1 class="text-xl font-bold gradient-text">XI RPL 2</h1>
+                </div>
+                
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#hero" class="text-gray-300 hover:text-white transition">Home</a>
+                    <a href="#learned" class="text-gray-300 hover:text-white transition">Skills</a>
+                    <a href="#teachers" class="text-gray-300 hover:text-white transition">Teachers</a>
+                    <a href="#structure" class="text-gray-300 hover:text-white transition">Structure</a>
+                    <a href="#students" class="text-gray-300 hover:text-white transition">Students</a>
+                    <a href="#album" class="text-gray-300 hover:text-white transition">Album</a>
+                    <a href="#comments" class="text-gray-300 hover:text-white transition">Comments</a>
+                </nav>
+
+                <button class="md:hidden text-gray-300 hover:text-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Dots -->
+    <div class="navigation-dots">
+        <div class="dot active" data-section="hero"></div>
+        <div class="dot" data-section="learned"></div>
+        <div class="dot" data-section="teachers"></div>
+        <div class="dot" data-section="structure"></div>
+        <div class="dot" data-section="students"></div>
+        <div class="dot" data-section="album"></div>
+        <div class="dot" data-section="comments"></div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="hero" class="section-fade">
+        <!-- Animated Particles -->
+        <div class="particles" id="particles"></div>
+        
+        <div class="absolute inset-0 bg-black/40"></div>
+        <div class="relative z-10 text-center max-w-4xl mx-auto px-6">
+            <h1 class="text-6xl md:text-8xl font-bold gradient-text mb-6 typewriter">XI RPL 2</h1>
+            <p class="text-xl md:text-2xl text-gray-300 mb-8 pulse">"Code, Collaborate, Create"</p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <button class="glass-effect px-8 py-4 rounded-xl hover-lift transition-all duration-300">
+                    <i class="fas fa-rocket mr-2"></i>Explore More
+                </button>
+                <button class="border border-gray-600 px-8 py-4 rounded-xl hover:bg-white/10 transition-all duration-300 hover-lift">
+                    <i class="fas fa-users mr-2"></i>Meet the Team
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- What We Learned -->
+    <section id="learned" class="section-fade">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-4xl font-bold text-center mb-16 gradient-text">What We Learned</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                <div class="glass-effect rounded-2xl p-6 text-center floating-card animate-slide-fade-in">
+                    <i class="fab fa-html5 text-5xl text-orange-500 mb-4"></i>
+                    <h3 class="font-semibold">HTML5</h3>
+                </div>
+                <div class="glass-effect rounded-2xl p-6 text-center floating-card animate-slide-fade-in">
+                    <i class="fab fa-css3-alt text-5xl text-blue-500 mb-4"></i>
+                    <h3 class="font-semibold">CSS3</h3>
+                </div>
+                <div class="glass-effect rounded-2xl p-6 text-center floating-card animate-slide-fade-in">
+                    <i class="fab fa-js text-5xl text-yellow-500 mb-4"></i>
+                    <h3 class="font-semibold">JavaScript</h3>
+                </div>
+                <div class="glass-effect rounded-2xl p-6 text-center floating-card animate-slide-fade-in">
+                    <i class="fab fa-java text-5xl text-red-500 mb-4"></i>
+                    <h3 class="font-semibold">Java</h3>
+                </div>
+                <div class="glass-effect rounded-2xl p-6 text-center floating-card animate-slide-fade-in">
+                    <i class="fab fa-php text-5xl text-purple-500 mb-4"></i>
+                    <h3 class="font-semibold">PHP</h3>
+                </div>
+                <div class="glass-effect rounded-2xl p-6 text-center floating-card animate-slide-fade-in">
+                    <i class="fab fa-laravel text-5xl text-red-400 mb-4"></i>
+                    <h3 class="font-semibold">Laravel</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Teachers Section -->
+    <section id="teachers" class="bg-black/30 section-fade">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-4xl font-bold text-center mb-16 gradient-text">Guru Mapel Produktif</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="glass-effect rounded-2xl p-8 text-center floating-card animate-slide-fade-in">
+                    <div class="w-32 h-32 mx-auto mb-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-tie text-4xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-2">Pak Budi</h3>
+                    <p class="text-blue-400 mb-4">Web Development</p>
+                    <p class="text-sm text-gray-400">15+ years experience in full-stack development</p>
+                </div>
+                <div class="glass-effect rounded-2xl p-8 text-center floating-card animate-slide-fade-in">
+                    <div class="w-32 h-32 mx-auto mb-6 bg-gradient-to-r from-green-500 to-teal-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-graduate text-4xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-2">Bu Sari</h3>
+                    <p class="text-green-400 mb-4">Database Management</p>
+                    <p class="text-sm text-gray-400">Expert in SQL and database design</p>
+                </div>
+                <div class="glass-effect rounded-2xl p-8 text-center floating-card animate-slide-fade-in">
+                    <div class="w-32 h-32 mx-auto mb-6 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-laptop-code text-4xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-2">Pak Agus</h3>
+                    <p class="text-orange-400 mb-4">Mobile Development</p>
+                    <p class="text-sm text-gray-400">Specialized in Android and iOS development</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Class Structure -->
+    <section id="structure" class="section-fade">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-4xl font-bold text-center mb-16 gradient-text">Struktur Kelas</h2>
+            <div class="timeline">
+                <div class="timeline-item animate-slide-fade-in">
+                    <div class="timeline-content floating-card">
+                        <h3 class="text-xl font-semibold mb-2">Wali Kelas</h3>
+                        <p class="text-gray-400">Pak Budi Santoso</p>
+                    </div>
+                </div>
+                <div class="timeline-item animate-slide-fade-in">
+                    <div class="timeline-content floating-card">
+                        <h3 class="text-xl font-semibold mb-2">Ketua Kelas</h3>
+                        <p class="text-gray-400">Ahmad Rizky</p>
+                    </div>
+                </div>
+                <div class="timeline-item animate-slide-fade-in">
+                    <div class="timeline-content floating-card">
+                        <h3 class="text-xl font-semibold mb-2">Wakil Ketua</h3>
+                        <p class="text-gray-400">Siti Rahayu</p>
+                    </div>
+                </div>
+                <div class="timeline-item animate-slide-fade-in">
+                    <div class="timeline-content floating-card">
+                        <h3 class="text-xl font-semibold mb-2">Sekretaris</h3>
+                        <p class="text-gray-400">Dewi Anggraini</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Students Section -->
+    <section id="students" class="bg-black/30 section-fade">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-4xl font-bold text-center mb-16 gradient-text">Data Siswa</h2>
+            <div class="student-grid">
+                <div class="glass-effect rounded-2xl p-6 floating-card animate-slide-fade-in">
+                    <img src="https://i.pravatar.cc/150?img=1" alt="Student" class="w-24 h-24 rounded-full mx-auto mb-4 hover-lift">
+                    <h3 class="text-xl font-semibold text-center mb-2">Ahmad Rizky</h3>
+                    <p class="text-gray-400 text-center mb-2">NIS: 123456</p>
+                    <div class="flex justify-center space-x-4">
+                        <a href="#" class="social-icon text-blue-400 hover:text-blue-300">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="glass-effect rounded-2xl p-6 floating-card animate-slide-fade-in">
+                    <img src="https://i.pravatar.cc/150?img=2" alt="Student" class="w-24 h-24 rounded-full mx-auto mb-4 hover-lift">
+                    <h3 class="text-xl font-semibold text-center mb-2">Siti Rahayu</h3>
+                    <p class="text-gray-400 text-center mb-2">NIS: 123457</p>
+                    <div class="flex justify-center space-x-4">
+                        <a href="#" class="social-icon text-blue-400 hover:text-blue-300">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="glass-effect rounded-2xl p-6 floating-card animate-slide-fade-in">
+                    <img src="https://i.pravatar.cc/150?img=3" alt="Student" class="w-24 h-24 rounded-full mx-auto mb-4 hover-lift">
+                    <h3 class="text-xl font-semibold text-center mb-2">Dewi Anggraini</h3>
+                    <p class="text-gray-400 text-center mb-2">NIS: 123458</p>
+                    <div class="flex justify-center space-x-4">
+                        <a href="#" class="social-icon text-blue-400 hover:text-blue-300">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Album Section -->
+    <section id="album" class="section-fade">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-4xl font-bold text-center mb-16 gradient-text">Album in Twelve</h2>
+            <div class="gallery-container">
+                <div class="gallery-images">
+                    <img src="https://placehold.co/1200x500/222/fff?text=Class+Photo+1" alt="Class Photo 1">
+                    <img src="https://placehold.co/1200x500/333/fff?text=Class+Photo+2" alt="Class Photo 2">
+                    <img src="https://placehold.co/1200x500/444/fff?text=Class+Photo+3" alt="Class Photo 3">
+                </div>
+                <button class="gallery-btn prev">❮</button>
+                <button class="gallery-btn next">❯</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comments Section -->
+    <section id="comments" class="bg-black/30 section-fade">
+        <div class="max-w-2xl mx-auto">
+            <h2 class="text-4xl font-bold text-center mb-16 gradient-text">Komentar</h2>
+            <div class="glass-effect rounded-2xl p-8">
+                <textarea placeholder="Tulis pesan anonim..." class="w-full p-4 bg-gray-800 rounded-lg mb-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                <button class="w-full py-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition hover-lift">Kirim</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 bg-black/50">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="flex justify-center space-x-6 mb-6">
+                <a href="https://instagram.com/kelasrpl" target="_blank" class="social-icon text-gray-400 hover:text-white">
+                    <i class="fab fa-instagram text-2xl"></i>
+                </a>
+            </div>
+            <p class="text-gray-400">© 2024 XI RPL 2. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create animated particles
+            function createParticles() {
+                const particlesContainer = document.getElementById('particles');
+                const particleCount = 50;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    // Random properties
+                    const size = Math.random() * 4 + 1;
+                    const posX = Math.random() * 100;
+                    const posY = Math.random() * 100;
+                    const delay = Math.random() * 6;
+                    const duration = Math.random() * 4 + 4;
+                    
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${posX}%`;
+                    particle.style.top = `${posY}%`;
+                    particle.style.animationDelay = `${delay}s`;
+                    particle.style.animationDuration = `${duration}s`;
+                    
+                    particlesContainer.appendChild(particle);
+                }
+            }
+
+            // Header scroll behavior
+            let lastScrollY = window.scrollY;
+            const header = document.getElementById('main-header');
+
+            function handleHeaderScroll() {
+                const currentScrollY = window.scrollY;
+                
+                if (currentScrollY > 100) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+
+                lastScrollY = currentScrollY;
+            }
+
+            // Scroll progress
+            function updateScrollProgress() {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const scrollPercent = (scrollTop / docHeight) * 100;
+                document.getElementById('scroll-progress').style.width = `${scrollPercent}%`;
+            }
+
+            // Gallery functionality
+            const galleryImages = document.querySelector('.gallery-images');
+            const prevBtn = document.querySelector('.gallery-btn.prev');
+            const nextBtn = document.querySelector('.gallery-btn.next');
+            let currentIndex = 0;
+
+            function updateGallery() {
+                galleryImages.style.transform = `translateX(-${currentIndex * 100}%)`;
+            }
+
+            prevBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex - 1 + 3) % 3;
+                updateGallery();
+            });
+
+            nextBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex + 1) % 3;
+                updateGallery();
+            });
+
+            // Navigation dots functionality
+            const dots = document.querySelectorAll('.dot');
+            const sections = document.querySelectorAll('section');
+
+            function updateActiveDot() {
+                const scrollPosition = window.scrollY + 100;
+                
+                sections.forEach((section, index) => {
+                    const sectionTop = section.offsetTop;
+                    const sectionBottom = sectionTop + section.offsetHeight;
+                    
+                    if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                        dots.forEach(dot => dot.classList.remove('active'));
+                        dots[index].classList.add('active');
+                    }
+                });
+            }
+
+            dots.forEach(dot => {
+                dot.addEventListener('click', () => {
+                    const sectionId = dot.dataset.section;
+                    document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+
+            // Intersection Observer for animations
+            const animatedElements = document.querySelectorAll('.animate-slide-fade-in');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            animatedElements.forEach(el => observer.observe(el));
+
+            // Initialize
+            createParticles();
+            window.addEventListener('scroll', () => {
+                handleHeaderScroll();
+                updateScrollProgress();
+                updateActiveDot();
+            });
+
+            // Initial call
+            handleHeaderScroll();
+            updateScrollProgress();
+            updateActiveDot();
+        });
+    </script>
+</body>
+</html>
